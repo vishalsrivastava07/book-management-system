@@ -1,0 +1,12 @@
+1. JavaScript Variables -> let, const, Var
+Var :-> It is function scoped/globally scoped Variables, It supports Hoisted as undefined 
+//When to Use - Although var is generally discouraged in modern JavaScript, it is useful in legacy code or specific cases where function scope is required.
+
+let :-> It is Blocked - scoped local Variables, It supports Hoisted (Temporal Dead Zone)
+//When to Use - let is ideal for variables that will change their value and need to be block-scoped.
+
+Const :-> It is Blocked - scoped local Variables, It supports Hoisted (Temporal Dead Zone)
+//When to Use - For values that should never change, For objects/arrays where the structure is fixed but properties may be mutable.
+
+
+
