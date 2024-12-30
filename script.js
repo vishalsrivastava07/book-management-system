@@ -1,3 +1,4 @@
+//3. Implement Basic Data Manipulation (Add, Edit, Delete Books)
 // Store books in memory
 let books = [];
 
@@ -55,14 +56,12 @@ const editBookPrompt = (index) => {
     editBook(index, updatedBook);
 };
 
-// Calculate Book Age
+//4. Implement Business Logic -> Calculate Book Age , Categorize Books by Genre
 const calculateBookAge = (publicationDate) => {
     const currentYear = new Date().getFullYear();
     const publicationYear = new Date(publicationDate).getFullYear();
     return currentYear - publicationYear;
 };
-
-// Categorize Books by Genre
 const categorizeBooks = () => {
     const genres = books.reduce((categories, book) => {
         if (!categories[book.genre]) {
@@ -74,7 +73,9 @@ const categorizeBooks = () => {
     console.log("Books Categorized by Genre:", genres);
 };
 
-// Form Submission
+
+//1. Add JavaScript to Validate Form Inputs
+//2. Use ES6 Features to Refactor Code  -> Form Submission
 document.querySelector("form").addEventListener("submit", (event) => {
     event.preventDefault();
 
