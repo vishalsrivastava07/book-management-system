@@ -10,11 +10,6 @@
 - Pagination support to display limited data per page.
 - Pre-fill form fields for editing books using localStorage.
 
-### Back-End Functionality
-- Created API routes using Express.js.
-- Implemented filtering, searching, and pagination on book data.
-- Used body-parser middleware for handling JSON payloads.
-
 ### How to Run
 1. Clone the repository.
 2. Run `npm install` to install dependencies.
