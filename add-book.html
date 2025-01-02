@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management System - Add Book</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Add Book</h1>
+    </header>
+    <nav>
+        <a href="index.html">Book List</a>
+        <a href="add-book.html">Add Book</a>
+
+    </nav>
+    <div class="container">
+        <form id="book-form" name="" action = "" enctype="multipart/form-data">
+            <input type="text" id="title" placeholder="Book Title" required />
+            <input type="text" id="author" placeholder="Author" required />
+            <input type="text" id="isbn" placeholder="ISBN" required pattern="\d+" onclick="validateISBN()" />
+            <input type="date" id="pub-date" placeholder="Publication Date" required />
+            <input type="text" id="genre" placeholder="Genre" required />
+            <input type="hidden" id="edit-index" />
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

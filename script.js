@@ -1,100 +1,116 @@
-//3. Implement Basic Data Manipulation (Add, Edit, Delete Books)
-// Store books in memory
-let books = [];
-
-// Add Book
-const addBook = (book) => {
-    books.push(book);
-    displayBooks();
-};
-
-// Edit Book
-const editBook = (index, updatedBook) => {
-    books[index] = updatedBook;
-    displayBooks();
-};
-
-// Delete Book
-const deleteBook = (index) => {
-    books.splice(index, 1);
-    displayBooks();
-};
-
-// Display Books in Table
-const displayBooks = () => {
+// Load books from localStorage
+function loadBooks() {
+    const books = JSON.parse(localStorage.getItem("books")) || [];
     const bookList = document.getElementById("book-list");
     bookList.innerHTML = "";
 
     books.forEach((book, index) => {
-        const bookRow = `
-            <tr>
-                <td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publicationDate}</td>
-                <td>${book.genre}</td>
-                <td>
-                    <button onclick="editBookPrompt(${index})">Edit</button>
-                    <button onclick="deleteBook(${index})">Delete</button>
-                </td>
-            </tr>
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${book.title}</td>
+            <td>${book.author}</td>
+            <td>${book.isbn}</td>
+            <td>${book.pubDate}</td>
+            <td>${book.genre}</td>
+            <td>
+                <button class="edit-btn" onclick="editBook(${index})">Edit</button>
+                <button class="delete-btn" onclick="deleteBook(${index})">Delete</button>
+            </td>
         `;
-        bookList.innerHTML += bookRow;
+
+        bookList.appendChild(row);
     });
-};
+}
 
-// Handle Edit Prompt
-const editBookPrompt = (index) => {
-    const book = books[index];
-    const updatedBook = {
-        title: prompt("Edit Title:", book.title) || book.title,
-        author: prompt("Edit Author:", book.author) || book.author,
-        isbn: prompt("Edit ISBN:", book.isbn) || book.isbn,
-        publicationDate: prompt("Edit Publication Date:", book.publicationDate) || book.publicationDate,
-        genre: prompt("Edit Genre:", book.genre) || book.genre,
-    };
-    editBook(index, updatedBook);
-};
+// Validation for ISBN: Only numeric input is allowed
+function validateISBN() {
+    const isbnField = document.getElementById("isbn");
+    const isbnValue = isbnField.value;
 
-//4. Implement Business Logic -> Calculate Book Age , Categorize Books by Genre
-const calculateBookAge = (publicationDate) => {
-    const currentYear = new Date().getFullYear();
-    const publicationYear = new Date(publicationDate).getFullYear();
-    return currentYear - publicationYear;
-};
-const categorizeBooks = () => {
-    const genres = books.reduce((categories, book) => {
-        if (!categories[book.genre]) {
-            categories[book.genre] = [];
-        }
-        categories[book.genre].push(book);
-        return categories;
-    }, {});
-    console.log("Books Categorized by Genre:", genres);
-};
+    // Check if the ISBN contains only numeric characters
+    if (!/^\d*$/.test(isbnValue)) {
+        isbnField.setCustomValidity("ISBN must contain only numeric characters.");
+        isbnField.reportValidity(); // Display the validation message
+    } else {
+        isbnField.setCustomValidity(""); // Clear the validation message
+    }
+}
+
+// Add event listeners for ISBN validation
+document.getElementById("isbn")?.addEventListener("blur", validateISBN);
+document.getElementById("isbn")?.addEventListener("input", validateISBN);
 
 
-//1. Add JavaScript to Validate Form Inputs
-//2. Use ES6 Features to Refactor Code  -> Form Submission
-document.querySelector("form").addEventListener("submit", (event) => {
-    event.preventDefault();
+// Add book to localStorage
+document.getElementById("book-form")?.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-    const title = document.getElementById("title").value.trim();
-    const author = document.getElementById("author").value.trim();
-    const isbn = document.getElementById("isbn").value.trim();
-    const publicationDate = document.getElementById("publication-date").value;
+    const title = document.getElementById("title").value;
+    const author = document.getElementById("author").value;
+    const isbn = document.getElementById("isbn").value;
+    const pubDate = document.getElementById("pub-date").value;
     const genre = document.getElementById("genre").value;
 
-    if (!title || !author || !isbn || !publicationDate || !genre) {
-        alert("All fields are required!");
-        return;
+    const books = JSON.parse(localStorage.getItem("books")) || [];
+    const editIndex = document.getElementById("edit-index").value;
+
+    if (editIndex !== "") {
+        books[editIndex] = { title, author, isbn, pubDate, genre };
+        document.getElementById("edit-index").value = "";
+    } else {
+        books.push({ title, author, isbn, pubDate, genre });
     }
 
-    if (isNaN(isbn)) {
-        alert("ISBN must be a number!");
-        return;
-    }
+    localStorage.setItem("books", JSON.stringify(books));
 
-    addBook({ title, author, isbn, publicationDate, genre });
-    document.querySelector("form").reset();
+    alert("Book saved successfully!");
+    window.location.href = "index.html";
 });
+
+// Delete book from localStorage
+function deleteBook(index) {
+    const books = JSON.parse(localStorage.getItem("books")) || [];
+    books.splice(index, 1);
+    localStorage.setItem("books", JSON.stringify(books));
+    loadBooks();
+}
+
+// Edit book
+function editBook(index) {
+    const books = JSON.parse(localStorage.getItem("books")) || [];
+    const book = books[index];
+
+    // Store the book data and index in localStorage
+    localStorage.setItem("editBook", JSON.stringify({ book, index }));
+
+    // Redirect to the add-book.html page
+    window.location.href = "add-book.html";
+}
+
+// Pre fills the data from previous DOM
+document.addEventListener("DOMContentLoaded", () => {
+    const editData = JSON.parse(localStorage.getItem("editBook"));
+
+    if (editData) {
+        const { book, index } = editData;
+
+        // Pre-fill the form fields
+        document.getElementById("title").value = book.title;
+        document.getElementById("author").value = book.author;
+        document.getElementById("isbn").value = book.isbn;
+        document.getElementById("pub-date").value = book.pubDate;
+        document.getElementById("genre").value = book.genre;
+
+        // Set the hidden edit-index field
+        document.getElementById("edit-index").value = index;
+
+        // Clear edit data from localStorage after use
+        localStorage.removeItem("editBook");
+    }
+});
+
+// Load books on page load
+if (window.location.pathname.includes("index.html")) {
+    document.addEventListener("DOMContentLoaded", loadBooks);
+}
