@@ -1,3 +1,5 @@
+// Initialize an array to store books
+//const booksArray = [];
 // Load books from localStorage and simulated server
 async function loadBooks(filter = "", sortOption = "") {
     const bookList = document.getElementById("book-list");
