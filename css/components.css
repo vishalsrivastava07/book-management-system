@@ -44,3 +44,42 @@ button {
 button:hover {
     background-color: #45a049;
 }
+/* Container for buttons to align them horizontally */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Adds space between the buttons */
+}
+
+/* General button styles */
+.btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Edit button styles */
+.edit-btn {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+/* Delete button styles */
+.delete-btn {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
