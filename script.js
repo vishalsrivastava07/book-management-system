@@ -1,6 +1,6 @@
 //3. Implement Basic Data Manipulation (Add, Edit, Delete Books)
 // Store books in memory
-let books = [];
+const books = [];
 
 // Add Book
 const addBook = (book) => {
