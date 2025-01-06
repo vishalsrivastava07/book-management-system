@@ -1,35 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book Management System</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <form action="#" method="POST">
-      <h1>Add a New Book</h1>
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required />
-
-      <label for="author">Author:</label>
-      <input type="text" id="author" name="author" required />
-
-      <label for="isbn">ISBN:</label>
-      <input type="text" id="isbn" name="isbn" required />
-
-      <label for="publication_date">Publication Date:</label>
-      <input
-        type="date"
-        id="publication_date"
-        name="publication_date"
-        required
-      />
-
-      <label for="genre">Genre:</label>
-      <input type="text" id="genre" name="genre" required />
-
-      <button type="submit">Add Book</button>
-    </form>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management System - Book List</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Book Management System</h1>
+    </header>
+    <nav>
+        <a href="index.html">Book List</a>
+        <a href="add-book.html">Add Book</a>
+    </nav>
+    <div class="container">
+        <div class="search-container">
+            <label for="search-bar">Search Books:</label>
+            <input type="text" id="search-bar" placeholder="Search by title, author, or genre...">
+        </div>
+        <div class="filter-container">
+            <h2>Filter, Sort, and Search Books</h2>
+            <div class="genre-buttons">
+                <button id="filter-fiction">Fiction</button>
+                <button id="filter-non-fiction">Non-Fiction</button>
+                <button id="clear-filters" class="clear-btn">Clear All Filters</button>
+            </div>
+            <div class="sort-buttons">
+                <h3>Sort by Title:</h3>
+                <button id="sort-asc">Ascending</button>
+                <button id="sort-desc">Descending</button>
+            </div>
+        </div>
+        <table class="table-auto">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Publication Date</th>
+                    <th>Genre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="book-list">
+                <!-- Dynamic rows will be appended here by script.js -->
+            </tbody>
+        </table>
+    </div>
+</body>
 </html>
