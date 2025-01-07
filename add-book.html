@@ -16,21 +16,28 @@
     <nav>
         <a href="index.html">Book List</a>
         <a href="add-book.html">Add Book</a>
-
     </nav>
     <div class="container">
-        <form id="book-form" name="" action = "submit" enctype="multipart/form-data">
+        <form id="book-form" action="submit" enctype="multipart/form-data">
             <input type="text" id="title" placeholder="Book Title" required />
             <input type="text" id="author" placeholder="Author" required />
-            <input type="text" id="isbn" placeholder="ISBN" required pattern="\d+" onclick="validateISBN()" />
+            <input type="text" id="isbn" placeholder="ISBN" required pattern="\d+" />
             <input type="date" id="pub-date" placeholder="Publication Date" required />
             <input type="text" id="genre" placeholder="Genre" required />
-            <input type="hidden" id="edit-index" />
+            
+            <label for="book-type">Book Type:</label>
+            <select id="book-type" required>
+                <option value="">Select Book Type</option>
+                <option value="Ebook">Ebook</option>
+                <option value="PrintedBook">PrintedBook</option>
+            </select>
 
+            <label for="basebook">Purchase Link:</label>
+            <input type="url" id="basebook" placeholder="Purchase Link (Optional)" />
+
+            <input type="hidden" id="edit-index" />
             <button type="submit">Submit</button>
         </form>
     </div>
 </body>
-</html> 
-
-
+</html>
