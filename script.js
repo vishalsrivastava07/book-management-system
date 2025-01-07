@@ -1,4 +1,5 @@
-//3. Implement Basic Data Manipulation (Add, Edit, Delete Books)
+// Book Management Application
+
 // Store books in memory
 const books = [];
 
@@ -21,80 +22,169 @@ const deleteBook = (index) => {
 };
 
 // Display Books in Table
-const displayBooks = () => {
+const displayBooks = async (filter = "", sortOption = "") => {
     const bookList = document.getElementById("book-list");
     bookList.innerHTML = "";
 
-    books.forEach((book, index) => {
-        const bookRow = `
-            <tr>
-                <td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publicationDate}</td>
-                <td>${book.genre}</td>
-                <td>
-                    <button onclick="editBookPrompt(${index})">Edit</button>
-                    <button onclick="deleteBook(${index})">Delete</button>
-                </td>
-            </tr>
-        `;
-        bookList.innerHTML += bookRow;
-    });
-};
+    try {
+        // Simulate server request
+        const booksData = await fetchBooks();
 
-// Handle Edit Prompt
-const editBookPrompt = (index) => {
-    const book = books[index];
-    const updatedBook = {
-        title: prompt("Edit Title:", book.title) || book.title,
-        author: prompt("Edit Author:", book.author) || book.author,
-        isbn: prompt("Edit ISBN:", book.isbn) || book.isbn,
-        publicationDate: prompt("Edit Publication Date:", book.publicationDate) || book.publicationDate,
-        genre: prompt("Edit Genre:", book.genre) || book.genre,
-    };
-    editBook(index, updatedBook);
-};
+        // Filter and sort books
+        let filteredBooks = booksData.filter(book =>
+            book.title.toLowerCase().includes(filter.toLowerCase()) ||
+            book.author.toLowerCase().includes(filter.toLowerCase()) ||
+            book.genre.toLowerCase().includes(filter.toLowerCase())
+        );
 
-//4. Implement Business Logic -> Calculate Book Age , Categorize Books by Genre
-const calculateBookAge = (publicationDate) => {
-    const currentYear = new Date().getFullYear();
-    const publicationYear = new Date(publicationDate).getFullYear();
-    return currentYear - publicationYear;
-};
-const categorizeBooks = () => {
-    const genres = books.reduce((categories, book) => {
-        if (!categories[book.genre]) {
-            categories[book.genre] = [];
+        if (sortOption === "asc") {
+            filteredBooks.sort((a, b) => a.title.localeCompare(b.title));
+        } else if (sortOption === "desc") {
+            filteredBooks.sort((a, b) => b.title.localeCompare(a.title));
         }
-        categories[book.genre].push(book);
-        return categories;
-    }, {});
-    console.log("Books Categorized by Genre:", genres);
+
+        // Display filtered books
+        if (filteredBooks.length === 0) {
+            bookList.innerHTML = "<tr><td colspan='6'>No books found.</td></tr>";
+        } else {
+            filteredBooks.forEach((book, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn || "N/A"}</td>
+                    <td>${book.pubDate || "N/A"}</td>
+                    <td>${book.genre || "N/A"}</td>
+                    <td>
+                        <div class="button-container">
+                            <button class="edit-btn" onclick="editBook(${index})">Edit</button>
+                            <button class="delete-btn" onclick="deleteBook(${index})">Delete</button>
+                            <button class="details-btn" onclick="showBookDetails(${index})">Details</button>
+                        </div>
+                    </td>
+                `;
+                bookList.appendChild(row);
+            });
+        }
+    } catch (error) {
+        console.error("Error displaying books:", error);
+        bookList.innerHTML = "<tr><td colspan='6'>Failed to load books. Please try again later.</td></tr>";
+    }
 };
 
+// Simulate fetching books from a server
+const fetchBooks = async () => {
+    const localBooks = JSON.parse(localStorage.getItem("books")) || [];
+    try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/posts?author='Srivastava'");
+        if (!response.ok) throw new Error("Failed to fetch data from the server.");
 
-//1. Add JavaScript to Validate Form Inputs
-//2. Use ES6 Features to Refactor Code  -> Form Submission
-document.querySelector("form").addEventListener("submit", (event) => {
-    event.preventDefault();
+        const apiBooks = await response.json();
 
-    const title = document.getElementById("title").value.trim();
-    const author = document.getElementById("author").value.trim();
-    const isbn = document.getElementById("isbn").value.trim();
-    const publicationDate = document.getElementById("publication-date").value;
+        return [
+            ...localBooks,
+            ...apiBooks.map(item => ({
+                title: item.title,
+                author: "API Author",
+                isbn: "N/A",
+                pubDate: "N/A",
+                genre: "API Genre",
+            })),
+        ];
+    } catch (error) {
+        console.error("Error fetching books from server:", error);
+        return localBooks;
+    }
+};
+
+// Form submission for adding/updating books
+const handleBookFormSubmit = (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById("title").value;
+    const author = document.getElementById("author").value;
+    const isbn = document.getElementById("isbn").value;
+    const pubDate = document.getElementById("pub-date").value;
     const genre = document.getElementById("genre").value;
 
-    if (!title || !author || !isbn || !publicationDate || !genre) {
-        alert("All fields are required!");
-        return;
+    const books = JSON.parse(localStorage.getItem("books")) || [];
+    const editIndex = document.getElementById("edit-index").value;
+
+    if (editIndex !== "") {
+        books[editIndex] = { title, author, isbn, pubDate, genre };
+    } else {
+        books.push({ title, author, isbn, pubDate, genre });
     }
 
-    if (isNaN(isbn)) {
-        alert("ISBN must be a number!");
-        return;
-    }
+    localStorage.setItem("books", JSON.stringify(books));
+    alert("Book saved successfully!");
+    window.location.href = "index.html";
+};
 
-    addBook({ title, author, isbn, publicationDate, genre });
-    document.querySelector("form").reset();
+document.getElementById("book-form")?.addEventListener("submit", handleBookFormSubmit);
+
+// Show detailed book information
+const showBookDetails = (index) => {
+    const books = JSON.parse(localStorage.getItem("books")) || [];
+    const book = books[index];
+
+    if (book) {
+        alert(`Title: ${book.title}\nAuthor: ${book.author}\nISBN: ${book.isbn || "N/A"}\nPublication Date: ${book.pubDate || "N/A"}\nGenre: ${book.genre || "N/A"}`);
+    } else {
+        alert("Book details not found.");
+    }
+};
+
+// Pre-fill form for editing
+const prefillFormForEdit = () => {
+    const editData = JSON.parse(localStorage.getItem("editBook"));
+
+    if (editData) {
+        const { book, index } = editData;
+        document.getElementById("title").value = book.title;
+        document.getElementById("author").value = book.author;
+        document.getElementById("isbn").value = book.isbn;
+        document.getElementById("pub-date").value = book.pubDate;
+        document.getElementById("genre").value = book.genre;
+        document.getElementById("edit-index").value = index;
+
+        localStorage.removeItem("editBook");
+    }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.location.pathname.includes("add-book.html")) {
+        prefillFormForEdit();
+    } else if (window.location.pathname.includes("index.html")) {
+        displayBooks();
+    }
 });
+
+// ISBN validation
+const validateISBN = () => {
+    const isbnField = document.getElementById("isbn");
+    const isbnValue = isbnField.value;
+
+    if (!/^\d*$/.test(isbnValue)) {
+        isbnField.setCustomValidity("ISBN must contain only numeric characters.");
+        isbnField.reportValidity();
+    } else {
+        isbnField.setCustomValidity("");
+    }
+};
+
+document.getElementById("isbn")?.addEventListener("blur", validateISBN);
+document.getElementById("isbn")?.addEventListener("input", validateISBN);
+
+// Search and filter books
+document.getElementById("search-bar")?.addEventListener("input", (e) => displayBooks(e.target.value));
+document.getElementById("filter-fiction")?.addEventListener("click", () => displayBooks("Fiction"));
+document.getElementById("filter-non-fiction")?.addEventListener("click", () => displayBooks("Non-Fiction"));
+document.getElementById("clear-filters")?.addEventListener("click", () => {
+    document.getElementById("search-bar").value = "";
+    displayBooks();
+});
+
+// Sorting
+document.getElementById("sort-asc")?.addEventListener("click", () => displayBooks("", "asc"));
+document.getElementById("sort-desc")?.addEventListener("click", () => displayBooks("", "desc"));

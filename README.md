@@ -1,13 +1,20 @@
 # BMS is Book Management System -> This is only for training purpose
-Today We made a Basic HTML form with input fields and used css for better look
-In this Activity i've made a five input fields - Title, Author, ISBN, Publication Date, Genre
 
-On Day 2 ->
-- JavaScript Variables: There are three types of variables - let, const, var
-- Data Types: There are two types of data types - primitive types and non-primitive types
-- function: There are 5 ways to define a function - function declaration, function expression, arrow function, IIFE(Immediately Invoked function expression), Parameters and Default Values
-- Objects
-- Arrays
--  
+### Features
+- Add, edit, delete, and view books using `localStorage`.
+- Validate ISBN input with custom validation messages for incorrect formats.
+- Dynamic table rendering for books, populated via JavaScript.
+- Fetch data from external APIs using `fetch` and `axios`.
+- Search functionality to filter books by title.
+- Filter options for `userId` and `completed` status.
+- Pagination support to display limited data per page.
+- Pre-fill form fields for editing books using localStorage.
+
+### How to Run
+1. Clone the repository.
+2. Run `npm install` to install dependencies.
+3. Start the server with `node FetchAPI.js`.
+4. Open `index.html` or `add-book.html` in a browser for the front-end functionality.
+
 
 
