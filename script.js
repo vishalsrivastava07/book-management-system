@@ -1,6 +1,6 @@
 class BaseManager {
     constructor() {
-        // Wrap the init function in DOMContentLoaded to ensure DOM is ready
+        
         document.addEventListener("DOMContentLoaded", () => this.init());
     }
 
@@ -20,7 +20,7 @@ class BaseManager {
                     isbn: 12,
                     pubDate: "2025-01-01",
                     genre: "API Genre",
-                    price: 20.0, // Mock Price
+                    price: 20.0,
                     purchaseLink: "https://www.amazon.in/s?k=books&crid=744W0CQGEHJX&sprefix=book%2Caps%2C301&ref=nb_sb_noss_2",
                     bookType: "EBook",
                 })),
@@ -39,14 +39,12 @@ class BaseManager {
     }
 
     init() {
-        // To be overridden in derived classes
     }
 }
 
 class BookManager extends BaseManager {
     constructor() {
         super();
-        // Get the DOM elements
         this.bookList = document.getElementById("book-list");
         this.searchBar = document.getElementById("search-bar");
         this.filterFiction = document.getElementById("filter-fiction");
