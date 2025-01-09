@@ -1,52 +1,7 @@
-class BookManager {
+class BaseManager {
     constructor() {
-        // Get the DOM elements
-        this.bookList = document.getElementById("book-list");
-        this.searchBar = document.getElementById("search-bar");
-        this.filterFiction = document.getElementById("filter-fiction");
-        this.filterNonFiction = document.getElementById("filter-non-fiction");
-        this.clearFiltersBtn = document.getElementById("clear-filters");
-        this.sortAscBtn = document.getElementById("sort-asc");
-        this.sortDescBtn = document.getElementById("sort-desc");
-
         // Wrap the init function in DOMContentLoaded to ensure DOM is ready
         document.addEventListener("DOMContentLoaded", () => this.init());
-    }
-
-    async loadBooks(filter = "", sortOption = "", genreFilter = "") {
-        if (!this.bookList) return;
-
-        this.bookList.innerHTML = ""; // Clear the list first
-
-        try {
-            const books = await this.fetchBooks();
-
-            let filteredBooks = books.filter(book =>
-                (book.title.toLowerCase().includes(filter.toLowerCase()) ||
-                book.author.toLowerCase().includes(filter.toLowerCase()) ||
-                book.genre.toLowerCase().includes(filter.toLowerCase())) &&
-                (genreFilter === "" || book.genre.toLowerCase() === genreFilter.toLowerCase())
-            );
-
-            if (sortOption === "asc") {
-                filteredBooks.sort((a, b) =>
-                    a.title.toLowerCase().localeCompare(b.title.toLowerCase())
-                );
-            } else if (sortOption === "desc") {
-                filteredBooks.sort((a, b) =>
-                    b.title.toLowerCase().localeCompare(a.title.toLowerCase())
-                );
-            }
-
-            if (filteredBooks.length === 0) {
-                this.bookList.innerHTML = "<tr><td colspan='8'>No books found.</td></tr>";
-            } else {
-                filteredBooks.forEach((book, index) => this.createBookRow(book, index));
-            }
-        } catch (error) {
-            console.error("Error fetching books:", error);
-            this.bookList.innerHTML = "<tr><td colspan='8'>Failed to load books. Please try again later.</td></tr>";
-        }
     }
 
     async fetchBooks() {
@@ -81,6 +36,60 @@ class BookManager {
         const currentDate = new Date();
         const age = currentDate.getFullYear() - publicationDate.getFullYear();
         return age > 0 ? `${age} year(s)` : "Less than a year";
+    }
+
+    init() {
+        // To be overridden in derived classes
+    }
+}
+
+class BookManager extends BaseManager {
+    constructor() {
+        super();
+        // Get the DOM elements
+        this.bookList = document.getElementById("book-list");
+        this.searchBar = document.getElementById("search-bar");
+        this.filterFiction = document.getElementById("filter-fiction");
+        this.filterNonFiction = document.getElementById("filter-non-fiction");
+        this.clearFiltersBtn = document.getElementById("clear-filters");
+        this.sortAscBtn = document.getElementById("sort-asc");
+        this.sortDescBtn = document.getElementById("sort-desc");
+    }
+
+    async loadBooks(filter = "", sortOption = "", genreFilter = "") {
+        if (!this.bookList) return;
+
+        this.bookList.innerHTML = ""; // Clear the list first
+
+        try {
+            const books = await this.fetchBooks();
+
+            let filteredBooks = books.filter(book =>
+                (book.title.toLowerCase().includes(filter.toLowerCase()) ||
+                    book.author.toLowerCase().includes(filter.toLowerCase()) ||
+                    book.genre.toLowerCase().includes(filter.toLowerCase())) &&
+                (genreFilter === "" || book.genre.toLowerCase() === genreFilter.toLowerCase())
+            );
+
+            if (sortOption === "asc") {
+                filteredBooks.sort((a, b) =>
+                    a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+                );
+            } else if (sortOption === "desc") {
+                filteredBooks.sort((a, b) =>
+                    b.title.toLowerCase().localeCompare(a.title.toLowerCase())
+                );
+            }
+
+            if (filteredBooks.length === 0) {
+                this.bookList.innerHTML = "<tr><td colspan='8'>No books found.</td></tr>";
+            } else {
+                filteredBooks.forEach((book, index) => this.createBookRow(book, index));
+            }
+        } catch (error) {
+            console.error("Error fetching books:", error);
+            this.bookList.innerHTML = "<tr><td colspan='8'>Failed to load books. Please try again later.</td></tr>";
+        }
     }
 
     createBookRow(book, index) {
@@ -150,14 +159,14 @@ class BookManager {
 
         if (book) {
             alert(`Title: ${book.title}
-Author: ${book.author}
-ISBN: ${book.isbn || "N/A"}
-Publication Date: ${book.pubDate || "N/A"}
-Age: ${bookAge}
-Genre: ${book.genre || "N/A"}
-Book Type: ${book.bookType || "N/A"}
-Price: ${book.price ? `$${book.price}` : "N/A"}
-Purchase Link: ${book.purchaseLink}`);
+                Author: ${book.author}
+                ISBN: ${book.isbn || "N/A"}
+                Publication Date: ${book.pubDate || "N/A"}
+                Age: ${bookAge}
+                Genre: ${book.genre || "N/A"}
+                Book Type: ${book.bookType || "N/A"}
+                Price: ${book.price ? `$${book.price}` : "N/A"}
+                Purchase Link: ${book.purchaseLink}`);
         } else {
             alert("Book details not found.");
         }
