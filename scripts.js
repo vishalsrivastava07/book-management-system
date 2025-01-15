@@ -58,17 +58,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-// validateISBN function
-var validateISBN = function (isbn) {
-    return /^\d+$/.test(isbn);
-};
-// Generic data manipulation functions
-function getData(key) {
-    return JSON.parse(localStorage.getItem(key) || "[]");
-}
-function setData(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-}
 // BaseManager class
 var BaseManager = /** @class */ (function () {
     function BaseManager() {
@@ -81,7 +70,7 @@ var BaseManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        localBooks = getData("books");
+                        localBooks = JSON.parse(localStorage.getItem("books") || "[]");
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 4, , 5]);
@@ -95,10 +84,10 @@ var BaseManager = /** @class */ (function () {
                         apiBooks = _a.sent();
                         return [2 /*return*/, __spreadArray(__spreadArray([], localBooks, true), apiBooks.map(function (item) { return ({
                                 title: item.title,
-                                author: { name: "Author" },
-                                isbn: "12",
+                                author: "Author",
+                                isbn: 12,
                                 pubDate: "2025-01-01",
-                                genre: { name: "API Genre" },
+                                genre: "API Genre",
                                 price: 20.0,
                                 purchaseLink: "https://www.amazon.in/s?k=books&crid=744W0CQGEHJX&sprefix=book%2Caps%2C301&ref=nb_sb_noss_2",
                                 bookType: "EBook",
@@ -130,7 +119,7 @@ var BaseBook = /** @class */ (function () {
         this.price = price;
     }
     BaseBook.prototype.getBookDetails = function () {
-        return "Title: ".concat(this.title, ", Author: ").concat(this.author.name, ", Price: $").concat(this.price);
+        return "Title: ".concat(this.title, ", Author: ").concat(this.author, ", Price: $").concat(this.price);
     };
     return BaseBook;
 }());
@@ -164,7 +153,10 @@ var EBook = /** @class */ (function (_super) {
     };
     return EBook;
 }(BaseBook));
-// BookManager class extending BaseManager
+// validateISBN function
+var validateISBN = function (isbn) {
+    return /^\d+$/.test(isbn);
+};
 var BookManager = /** @class */ (function (_super) {
     __extends(BookManager, _super);
     function BookManager() {
@@ -235,27 +227,26 @@ var BookManager = /** @class */ (function (_super) {
         var _a;
         var bookAge = this.calculateBookAge(book.pubDate);
         var row = document.createElement("tr");
-        row.innerHTML = "\n            <td>".concat(book.title, "</td>\n            <td>").concat(book.author.name, "</td>\n            <td>").concat(book.isbn || "N/A", "</td>\n            <td>").concat(book.pubDate || "N/A", "</td>\n            <td>").concat(book.genre.name || "N/A", "</td>\n            <td>").concat(book.bookType || "N/A", "</td>\n            <td>").concat(book.price ? "$".concat(book.price) : "N/A", "</td>\n            <td>").concat(bookAge, "</td>\n            <td><a href=\"").concat(book.purchaseLink, "\" target=\"_blank\">Purchase</a></td>\n            <td>\n                <div class=\"button-container\">\n                    <button class=\"edit-btn\" onclick=\"bookManager.editBook(").concat(index, ")\">Edit</button>\n                    <button class=\"delete-btn\" onclick=\"bookManager.deleteBook(").concat(index, ")\">Delete</button>\n                    <button class=\"details-btn\" onclick=\"bookManager.showBookDetails(").concat(index, ")\">Details</button>\n                </div>\n            </td>\n        ");
+        row.innerHTML = "\n            <td>".concat(book.title, "</td>\n            <td>").concat(book.author, "</td>\n            <td>").concat(book.isbn || "N/A", "</td>\n            <td>").concat(book.pubDate || "N/A", "</td>\n            <td>").concat(book.genre || "N/A", "</td>\n            <td>").concat(book.bookType || "N/A", "</td>\n            <td>").concat(book.price ? "$".concat(book.price) : "N/A", "</td>\n            <td>").concat(bookAge, "</td>\n            <td><a href=\"").concat(book.purchaseLink, "\" target=\"_blank\">Purchase</a></td>\n            <td>\n                <div class=\"button-container\">\n                    <button class=\"edit-btn\" onclick=\"bookManager.editBook(").concat(index, ")\">Edit</button>\n                    <button class=\"delete-btn\" onclick=\"bookManager.deleteBook(").concat(index, ")\">Delete</button>\n                    <button class=\"details-btn\" onclick=\"bookManager.showBookDetails(").concat(index, ")\">Details</button>\n                </div>\n            </td>\n        ");
         (_a = this.bookList) === null || _a === void 0 ? void 0 : _a.appendChild(row);
     };
     BookManager.prototype.editBook = function (index) {
-        var books = getData("books");
+        var books = JSON.parse(localStorage.getItem("books") || "[]");
         var book = books[index];
-        setData("editBook", [{ book: book, index: index }]);
+        localStorage.setItem("editBook", JSON.stringify({ book: book, index: index }));
         window.location.href = "add-book.html";
     };
     BookManager.prefillForm = function () {
-        var _a;
-        var editData = getData("editBook")[0] || null;
+        var editData = JSON.parse(localStorage.getItem("editBook") || "{}");
         if (editData) {
             var book = editData.book, index = editData.index;
             document.getElementById("title").value = book.title;
-            document.getElementById("author").value = book.author.name;
+            document.getElementById("author").value = book.author;
             document.getElementById("isbn").value = book.isbn;
             document.getElementById("pub-date").value = book.pubDate;
-            document.getElementById("genre").value = book.genre.name;
-            document.getElementById("price").value = ((_a = book.price) === null || _a === void 0 ? void 0 : _a.toString()) || "";
-            document.getElementById("edit-index").value = index.toString();
+            document.getElementById("genre").value = book.genre;
+            document.getElementById("price").value = book.price || "";
+            document.getElementById("edit-index").value = index;
             localStorage.removeItem("editBook");
         }
     };
@@ -263,25 +254,20 @@ var BookManager = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var books;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        books = getData("books");
-                        books.splice(index, 1);
-                        setData("books", books);
-                        return [4 /*yield*/, this.loadBooks()];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
+                books = JSON.parse(localStorage.getItem("books") || "[]");
+                books.splice(index, 1);
+                localStorage.setItem("books", JSON.stringify(books));
+                this.loadBooks();
+                return [2 /*return*/];
             });
         });
     };
     BookManager.prototype.showBookDetails = function (index) {
-        var books = getData("books");
+        var books = JSON.parse(localStorage.getItem("books") || "[]");
         var book = books[index];
         var bookAge = this.calculateBookAge(book.pubDate);
         if (book) {
-            alert("Title: ".concat(book.title, "\n                Author: ").concat(book.author.name, "\n                ISBN: ").concat(book.isbn || "N/A", "\n                Publication Date: ").concat(book.pubDate || "N/A", "\n                Age: ").concat(bookAge, "\n                Genre: ").concat(book.genre.name || "N/A", "\n                Book Type: ").concat(book.bookType || "N/A", "\n                Price: ").concat(book.price ? "$".concat(book.price) : "N/A", "\n                Purchase Link: ").concat(book.purchaseLink));
+            alert("Title: ".concat(book.title, "\n                Author: ").concat(book.author, "\n                ISBN: ").concat(book.isbn || "N/A", "\n                Publication Date: ").concat(book.pubDate || "N/A", "\n                Age: ").concat(bookAge, "\n                Genre: ").concat(book.genre || "N/A", "\n                Book Type: ").concat(book.bookType || "N/A", "\n                Price: ").concat(book.price ? "$".concat(book.price) : "N/A", "\n                Purchase Link: ").concat(book.purchaseLink));
         }
         else {
             alert("Book details not found.");
@@ -289,13 +275,12 @@ var BookManager = /** @class */ (function (_super) {
     };
     BookManager.prototype.saveBook = function (e) {
         e.preventDefault();
-        // Get form values
         var title = document.getElementById("title").value;
-        var authorName = document.getElementById("author").value;
+        var author = document.getElementById("author").value;
         var isbn = document.getElementById("isbn").value;
         var pubDate = document.getElementById("pub-date").value;
-        var genreName = document.getElementById("genre").value;
-        var price = parseFloat(document.getElementById("price").value);
+        var genre = document.getElementById("genre").value;
+        var price = document.getElementById("price").value;
         var purchaseLink = document.getElementById("purchase-link").value;
         var bookType = document.getElementById("book-type").value;
         if (!validateISBN(isbn)) {
@@ -304,21 +289,15 @@ var BookManager = /** @class */ (function (_super) {
         }
         var books = JSON.parse(localStorage.getItem("books") || "[]");
         var editIndex = document.getElementById("edit-index").value;
-        var author = { name: authorName };
-        var genre = { name: genreName };
         if (editIndex !== "") {
-            books[parseInt(editIndex, 10)] = { title: title, author: author, isbn: isbn, pubDate: pubDate, genre: genre, price: price, purchaseLink: purchaseLink, bookType: bookType };
+            books[editIndex] = { title: title, author: author, isbn: isbn, pubDate: pubDate, genre: genre, price: price, purchaseLink: purchaseLink, bookType: bookType };
         }
         else {
             books.push({ title: title, author: author, isbn: isbn, pubDate: pubDate, genre: genre, price: price, purchaseLink: purchaseLink, bookType: bookType });
         }
         localStorage.setItem("books", JSON.stringify(books));
         alert("Book saved successfully!");
-        console.log("Form submitted and book saved:", { title: title, author: author, isbn: isbn });
-        // Redirect to index.html after a short delay (to ensure everything is saved)
-        setTimeout(function () {
-            window.location.href = "index.html";
-        }, 500); // A delay might be needed to ensure proper saving before redirection
+        window.location.href = "index.html";
     };
     BookManager.prototype.init = function () {
         var _this = this;
@@ -327,15 +306,14 @@ var BookManager = /** @class */ (function (_super) {
         (_b = this.searchBar) === null || _b === void 0 ? void 0 : _b.addEventListener("input", function (e) {
             _this.loadBooks(e.target.value);
         });
-        (_c = this.filterFiction) === null || _c === void 0 ? void 0 : _c.addEventListener("click", function () { var _a; return _this.loadBooks(((_a = _this.searchBar) === null || _a === void 0 ? void 0 : _a.value) || "", "", "fiction"); });
-        (_d = this.filterNonFiction) === null || _d === void 0 ? void 0 : _d.addEventListener("click", function () { var _a; return _this.loadBooks(((_a = _this.searchBar) === null || _a === void 0 ? void 0 : _a.value) || "", "", "non-fiction"); });
+        (_c = this.filterFiction) === null || _c === void 0 ? void 0 : _c.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "", "fiction"); });
+        (_d = this.filterNonFiction) === null || _d === void 0 ? void 0 : _d.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "", "non-fiction"); });
         (_e = this.clearFiltersBtn) === null || _e === void 0 ? void 0 : _e.addEventListener("click", function () {
-            if (_this.searchBar)
-                _this.searchBar.value = "";
+            _this.searchBar.value = "";
             _this.loadBooks();
         });
-        (_f = this.sortAscBtn) === null || _f === void 0 ? void 0 : _f.addEventListener("click", function () { var _a; return _this.loadBooks(((_a = _this.searchBar) === null || _a === void 0 ? void 0 : _a.value) || "", "asc"); });
-        (_g = this.sortDescBtn) === null || _g === void 0 ? void 0 : _g.addEventListener("click", function () { var _a; return _this.loadBooks(((_a = _this.searchBar) === null || _a === void 0 ? void 0 : _a.value) || "", "desc"); });
+        (_f = this.sortAscBtn) === null || _f === void 0 ? void 0 : _f.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "asc"); });
+        (_g = this.sortDescBtn) === null || _g === void 0 ? void 0 : _g.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "desc"); });
         this.loadBooks();
     };
     return BookManager;
