@@ -12,7 +12,7 @@
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "build": "tsc scripts.ts",
+    "build": "tsc main.ts",
     "test" : "node test.js"
   }
   
