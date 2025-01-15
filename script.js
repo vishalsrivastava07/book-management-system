@@ -1,6 +1,6 @@
+// BaseManager class
 class BaseManager {
     constructor() {
-        
         document.addEventListener("DOMContentLoaded", () => this.init());
     }
 
@@ -38,11 +38,8 @@ class BaseManager {
         return age > 0 ? `${age} year(s)` : "Less than a year";
     }
 
-    init() {
-    }
+    init() {}
 }
-
-
 
 // BaseBook class
 class BaseBook {
@@ -82,6 +79,11 @@ class EBook extends BaseBook {
         return `EBook - ${this.getBookDetails()}, File Size: ${this.fileSize} MB`;
     }
 }
+
+// validateISBN function
+const validateISBN = (isbn) => {
+    return /^\d+$/.test(isbn);
+};
 
 class BookManager extends BaseManager {
     constructor() {
@@ -222,6 +224,11 @@ class BookManager extends BaseManager {
         const price = document.getElementById("price").value;
         const purchaseLink = document.getElementById("purchase-link").value;
         const bookType = document.getElementById("book-type").value;
+
+        if (!validateISBN(isbn)) {
+            alert("ISBN must contain only numeric characters.");
+            return;
+        }
 
         const books = JSON.parse(localStorage.getItem("books")) || [];
         const editIndex = document.getElementById("edit-index").value;
