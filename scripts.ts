@@ -1,9 +1,24 @@
-// BaseManager class
+function logMethodParams(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function (...args: any[]) {
+        console.log(`Method ${propertyKey} called with arguments:`, args);
+        return originalMethod.apply(this, args);
+    };
+}
+
+// validateISBN function
+const validateISBN = (isbn: string): boolean => {
+    return /^\d+$/.test(isbn);
+};
+
 class BaseManager {
     constructor() {
         document.addEventListener("DOMContentLoaded", () => this.init());
     }
 
+
+    
     async fetchBooks(): Promise<any[]> {
         const localBooks = JSON.parse(localStorage.getItem("books") || "[]");
         try {
@@ -31,6 +46,7 @@ class BaseManager {
         }
     }
 
+    @logMethodParams
     calculateBookAge(pubDate: string): string {
         const publicationDate = new Date(pubDate);
         const currentDate = new Date();
@@ -40,61 +56,6 @@ class BaseManager {
 
     init() {}
 }
-
-// BaseBook class
-class BaseBook {
-    title: string;
-    author: string;
-    price: number;
-
-    constructor({ title, author, price }: { title: string, author: string, price: number }) {
-        this.title = title;
-        this.author = author;
-        this.price = price;
-    }
-
-    getBookDetails(): string {
-        return `Title: ${this.title}, Author: ${this.author}, Price: $${this.price}`;
-    }
-}
-
-// PrintedBook class extending BaseBook
-class PrintedBook extends BaseBook {
-    bookCondition: string;
-    dimensions: string;
-    coverType: string;
-
-    constructor({ title, author, price, bookCondition, dimensions, coverType }: 
-        { title: string, author: string, price: number, bookCondition: string, dimensions: string, coverType: string }) {
-        super({ title, author, price });
-        this.bookCondition = bookCondition;
-        this.dimensions = dimensions;
-        this.coverType = coverType;
-    }
-
-    getPrintedBookDetails(): string {
-        return `Printed Book - ${this.getBookDetails()}, Condition: ${this.bookCondition}, Dimensions: ${this.dimensions}, Cover Type: ${this.coverType}`;
-    }
-}
-
-// EBook class extending BaseBook
-class EBook extends BaseBook {
-    fileSize: number;
-
-    constructor({ title, author, price, fileSize }: { title: string, author: string, price: number, fileSize: number }) {
-        super({ title, author, price });
-        this.fileSize = fileSize;
-    }
-
-    getEBookDetails(): string {
-        return `EBook - ${this.getBookDetails()}, File Size: ${this.fileSize} MB`;
-    }
-}
-
-// validateISBN function
-const validateISBN = (isbn: string): boolean => {
-    return /^\d+$/.test(isbn);
-};
 
 class BookManager extends BaseManager {
     bookList: HTMLElement | null;
@@ -114,6 +75,8 @@ class BookManager extends BaseManager {
         this.clearFiltersBtn = document.getElementById("clear-filters") as HTMLButtonElement;
         this.sortAscBtn = document.getElementById("sort-asc") as HTMLButtonElement;
         this.sortDescBtn = document.getElementById("sort-desc") as HTMLButtonElement;
+
+        
     }
 
     async loadBooks(filter: string = "", sortOption: string = "", genreFilter: string = ""): Promise<void> {
@@ -132,9 +95,6 @@ class BookManager extends BaseManager {
                 ) &&
                 (genreFilter === "" || book.genre?.name?.toLowerCase() === genreFilter.toLowerCase())
             );
-
-
-            
 
             if (sortOption === "asc") {
                 filteredBooks.sort((a, b) =>
@@ -157,7 +117,7 @@ class BookManager extends BaseManager {
         }
     }
 
-    
+    @logMethodParams
     createBookRow(book: any, index: number) {
         const bookAge = this.calculateBookAge(book.pubDate);
 
@@ -185,6 +145,7 @@ class BookManager extends BaseManager {
         this.bookList?.appendChild(row);
     }
 
+    @logMethodParams
     editBook(index: number) {
         const books = JSON.parse(localStorage.getItem("books") || "[]");
         const book = books[index];
@@ -192,7 +153,6 @@ class BookManager extends BaseManager {
         localStorage.setItem("editBook", JSON.stringify({ book, index }));
         window.location.href = "add-book.html";
     }
-
     static prefillForm() {
         const editData = JSON.parse(localStorage.getItem("editBook") || "{}");
 
@@ -211,6 +171,8 @@ class BookManager extends BaseManager {
         }
     }
 
+    
+    @logMethodParams
     async deleteBook(index: number) {
         const books = JSON.parse(localStorage.getItem("books") || "[]");
         books.splice(index, 1);
@@ -218,6 +180,7 @@ class BookManager extends BaseManager {
         this.loadBooks();
     }
 
+    @logMethodParams
     showBookDetails(index: number) {
         const books = JSON.parse(localStorage.getItem("books") || "[]");
         const book = books[index];
