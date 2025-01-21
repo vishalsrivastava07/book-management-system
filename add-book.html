@@ -3,41 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Management System - Add Book</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <script defer src="script.js"></script>
+    <title>Add or Edit Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <header>
-        <h1>Add Book</h1>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 text-center">
+        <h1 class="text-xl font-bold">Add or Edit Book</h1>
+        <nav class="mt-2">
+            <a href="index.html" class="text-white underline">Home</a>
+        </nav>
     </header>
-    <nav>
-        <a href="index.html">Book List</a>
-        <a href="add-book.html">Add Book</a>
-    </nav>
-    <div class="container">
-        <form id="book-form" action="submit" enctype="multipart/form-data">
-            <input type="text" id="title" placeholder="Book Title" required />
-            <input type="text" id="author" placeholder="Author" required />
-            <input type="text" id="isbn" placeholder="ISBN" required pattern="\d+" />
-            <input type="date" id="pub-date" placeholder="Publication Date" required />
-            <input type="text" id="genre" placeholder="Genre" required />
-            
-            <label for="book-type">Book Type:</label>
-            <select id="book-type" required>
-                <option value="">Select Book Type</option>
-                <option value="Ebook">Ebook</option>
-                <option value="PrintedBook">PrintedBook</option>
-            </select>
-
-            <label for="basebook">Purchase Link:</label>
-            <input type="url" id="basebook" placeholder="Purchase Link (Optional)" />
-
-            <input type="hidden" id="edit-index" />
-            <button type="submit">Submit</button>
+    <main class="p-4">
+        <form id="book-form" class="bg-white shadow rounded-md p-6 max-w-md mx-auto">
+            <input type="hidden" id="edit-index">
+            <div class="mb-4">
+                <label for="title" class="block text-sm font-medium">Title:</label>
+                <input type="text" id="title" class="border rounded-md p-2 w-full" required>
+            </div>
+            <div class="mb-4">
+                <label for="author" class="block text-sm font-medium">Author:</label>
+                <input type="text" id="author" class="border rounded-md p-2 w-full" required>
+            </div>
+            <div class="mb-4">
+                <label for="isbn" class="block text-sm font-medium">ISBN:</label>
+                <input type="text" id="isbn" class="border rounded-md p-2 w-full">
+            </div>
+            <div class="mb-4">
+                <label for="pub-date" class="block text-sm font-medium">Publication Date:</label>
+                <input type="date" id="pub-date" class="border rounded-md p-2 w-full" required>
+            </div>
+            <div class="mb-4">
+                <label for="genre" class="block text-sm font-medium">Genre:</label>
+                <input type="text" id="genre" class="border rounded-md p-2 w-full" required>
+            </div>
+            <div class="mb-4">
+                <label for="price" class="block text-sm font-medium">Price:</label>
+                <input type="number" id="price" class="border rounded-md p-2 w-full" step="0.01" required>
+            </div>
+            <div class="mb-4">
+                <label for="purchase-link" class="block text-sm font-medium">Purchase Link:</label>
+                <input type="url" id="purchase-link" class="border rounded-md p-2 w-full">
+            </div>
+            <div class="mb-4">
+                <label for="book-type" class="block text-sm font-medium">Book Type:</label>
+                <select id="book-type" class="border rounded-md p-2 w-full">
+                    <option value="EBook">EBook</option>
+                    <option value="PrintedBook">Printed Book</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Book</button>
         </form>
-    </div>
+    </main>
+    <script src="scripts.js"></script>
 </body>
 </html>
