@@ -1,51 +1,13 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
-    var useValue = arguments.length > 2;
-    for (var i = 0; i < initializers.length; i++) {
-        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
-    }
-    return useValue ? value : void 0;
-};
-var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
-    function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
-    var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
-    var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
-    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
-    var _, done = false;
-    for (var i = decorators.length - 1; i >= 0; i--) {
-        var context = {};
-        for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
-        for (var p in contextIn.access) context.access[p] = contextIn.access[p];
-        context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
-        var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
-        if (kind === "accessor") {
-            if (result === void 0) continue;
-            if (result === null || typeof result !== "object") throw new TypeError("Object expected");
-            if (_ = accept(result.get)) descriptor.get = _;
-            if (_ = accept(result.set)) descriptor.set = _;
-            if (_ = accept(result.init)) initializers.unshift(_);
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
         }
-        else if (_ = accept(result)) {
-            if (kind === "field") initializers.unshift(_);
-            else descriptor[key] = _;
-        }
-    }
-    if (target) Object.defineProperty(target, contextIn.name, descriptor);
-    done = true;
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -92,271 +54,377 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-function logMethodParams(target, propertyKey, descriptor) {
-    var originalMethod = descriptor.value;
-    descriptor.value = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        console.log("Method ".concat(propertyKey, " called with arguments:"), args);
-        return originalMethod.apply(this, args);
+// Main Book Manager Class
+var BookManager = /** @class */ (function () {
+    function BookManager() {
+        this.STORAGE_KEY = "books";
+        this.API_URL = "https://jsonplaceholder.typicode.com/posts";
+        this.allBooks = [];
+        this.currentSearchTerm = "";
+        this.currentGenreFilter = "";
+        this.currentSortOption = "";
+    }
+    // Initialize books from both local storage and API
+    BookManager.prototype.initializeBooks = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var localBooks, apiBooks, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        localBooks = this.getLocalBooks();
+                        return [4 /*yield*/, this.fetchApiBooks()];
+                    case 1:
+                        apiBooks = _a.sent();
+                        this.allBooks = __spreadArray(__spreadArray([], localBooks, true), apiBooks, true);
+                        return [2 /*return*/, this.filterAndSortBooks()];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error("Error initializing books:", error_1);
+                        this.allBooks = this.getLocalBooks();
+                        return [2 /*return*/, this.filterAndSortBooks()];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
     };
-}
-// validateISBN function
-var validateISBN = function (isbn) {
-    return /^\d+$/.test(isbn);
-};
-var BaseManager = function () {
-    var _a;
-    var _instanceExtraInitializers = [];
-    var _calculateBookAge_decorators;
-    return _a = /** @class */ (function () {
-            function BaseManager() {
-                var _this = this;
-                __runInitializers(this, _instanceExtraInitializers);
-                document.addEventListener("DOMContentLoaded", function () { return _this.init(); });
-            }
-            BaseManager.prototype.fetchBooks = function () {
-                return __awaiter(this, void 0, void 0, function () {
-                    var localBooks, response, apiBooks, error_1;
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
-                            case 0:
-                                localBooks = JSON.parse(localStorage.getItem("books") || "[]");
-                                _b.label = 1;
-                            case 1:
-                                _b.trys.push([1, 4, , 5]);
-                                return [4 /*yield*/, fetch("https://jsonplaceholder.typicode.com/posts")];
-                            case 2:
-                                response = _b.sent();
-                                if (!response.ok)
-                                    throw new Error("Failed to fetch data from the server.");
-                                return [4 /*yield*/, response.json()];
-                            case 3:
-                                apiBooks = _b.sent();
-                                return [2 /*return*/, __spreadArray(__spreadArray([], localBooks, true), apiBooks.map(function (item) { return ({
-                                        title: item.title,
-                                        author: "Author",
-                                        isbn: 12,
-                                        pubDate: "2025-01-01",
-                                        genre: "API Genre",
-                                        price: 20.0,
-                                        purchaseLink: "https://www.amazon.in/s?k=books&crid=744W0CQGEHJX&sprefix=book%2Caps%2C301&ref=nb_sb_noss_2",
-                                        bookType: "EBook",
-                                    }); }), true)];
-                            case 4:
-                                error_1 = _b.sent();
-                                console.error("Error fetching books from server:", error_1);
-                                return [2 /*return*/, localBooks];
-                            case 5: return [2 /*return*/];
-                        }
-                    });
-                });
-            };
-            BaseManager.prototype.calculateBookAge = function (pubDate) {
-                var publicationDate = new Date(pubDate);
-                var currentDate = new Date();
-                var age = currentDate.getFullYear() - publicationDate.getFullYear();
-                return age > 0 ? "".concat(age, " year(s)") : "Less than a year";
-            };
-            BaseManager.prototype.init = function () { };
-            return BaseManager;
-        }()),
-        (function () {
-            var _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            _calculateBookAge_decorators = [logMethodParams];
-            __esDecorate(_a, null, _calculateBookAge_decorators, { kind: "method", name: "calculateBookAge", static: false, private: false, access: { has: function (obj) { return "calculateBookAge" in obj; }, get: function (obj) { return obj.calculateBookAge; } }, metadata: _metadata }, null, _instanceExtraInitializers);
-            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        })(),
-        _a;
-}();
-var BookManager = function () {
-    var _a;
-    var _classSuper = BaseManager;
-    var _instanceExtraInitializers = [];
-    var _createBookRow_decorators;
-    var _editBook_decorators;
-    var _deleteBook_decorators;
-    var _showBookDetails_decorators;
-    return _a = /** @class */ (function (_super) {
-            __extends(BookManager, _super);
-            function BookManager() {
-                var _this = _super.call(this) || this;
-                _this.bookList = __runInitializers(_this, _instanceExtraInitializers);
-                _this.bookList = document.getElementById("book-list");
-                _this.searchBar = document.getElementById("search-bar");
-                _this.filterFiction = document.getElementById("filter-fiction");
-                _this.filterNonFiction = document.getElementById("filter-non-fiction");
-                _this.clearFiltersBtn = document.getElementById("clear-filters");
-                _this.sortAscBtn = document.getElementById("sort-asc");
-                _this.sortDescBtn = document.getElementById("sort-desc");
-                return _this;
-            }
-            BookManager.prototype.loadBooks = function () {
-                return __awaiter(this, arguments, void 0, function (filter, sortOption, genreFilter) {
-                    var books, filteredBooks, error_2;
-                    var _this = this;
-                    if (filter === void 0) { filter = ""; }
-                    if (sortOption === void 0) { sortOption = ""; }
-                    if (genreFilter === void 0) { genreFilter = ""; }
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
-                            case 0:
-                                if (!this.bookList)
-                                    return [2 /*return*/];
-                                this.bookList.innerHTML = ""; // Clear the list first
-                                _b.label = 1;
-                            case 1:
-                                _b.trys.push([1, 3, , 4]);
-                                return [4 /*yield*/, this.fetchBooks()];
-                            case 2:
-                                books = _b.sent();
-                                filteredBooks = books.filter(function (book) {
-                                    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-                                    return (((_c = (_b = book.title) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes(filter.toLowerCase())) !== null && _c !== void 0 ? _c : false) ||
-                                        ((_f = (_e = (_d = book.author) === null || _d === void 0 ? void 0 : _d.name) === null || _e === void 0 ? void 0 : _e.toLowerCase().includes(filter.toLowerCase())) !== null && _f !== void 0 ? _f : false) ||
-                                        ((_j = (_h = (_g = book.genre) === null || _g === void 0 ? void 0 : _g.name) === null || _h === void 0 ? void 0 : _h.toLowerCase().includes(filter.toLowerCase())) !== null && _j !== void 0 ? _j : false)) &&
-                                        (genreFilter === "" || ((_l = (_k = book.genre) === null || _k === void 0 ? void 0 : _k.name) === null || _l === void 0 ? void 0 : _l.toLowerCase()) === genreFilter.toLowerCase());
-                                });
-                                if (sortOption === "asc") {
-                                    filteredBooks.sort(function (a, b) {
-                                        return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
-                                    });
-                                }
-                                else if (sortOption === "desc") {
-                                    filteredBooks.sort(function (a, b) {
-                                        return b.title.toLowerCase().localeCompare(a.title.toLowerCase());
-                                    });
-                                }
-                                if (filteredBooks.length === 0) {
-                                    this.bookList.innerHTML = "<tr><td colspan='8'>No books found.</td></tr>";
-                                }
-                                else {
-                                    filteredBooks.forEach(function (book, index) { return _this.createBookRow(book, index); });
-                                }
-                                return [3 /*break*/, 4];
-                            case 3:
-                                error_2 = _b.sent();
-                                console.error("Error fetching books:", error_2);
-                                this.bookList.innerHTML = "<tr><td colspan='8'>Failed to load books. Please try again later.</td></tr>";
-                                return [3 /*break*/, 4];
-                            case 4: return [2 /*return*/];
-                        }
-                    });
-                });
-            };
-            BookManager.prototype.createBookRow = function (book, index) {
-                var _b;
-                var bookAge = this.calculateBookAge(book.pubDate);
-                var row = document.createElement("tr");
-                row.innerHTML = "\n            <td>".concat(book.title, "</td>\n            <td>").concat(book.author, "</td>\n            <td>").concat(book.isbn || "N/A", "</td>\n            <td>").concat(book.pubDate || "N/A", "</td>\n            <td>").concat(book.genre || "N/A", "</td>\n            <td>").concat(book.bookType || "N/A", "</td>\n            <td>").concat(book.price ? "$".concat(book.price) : "N/A", "</td>\n            <td>").concat(bookAge, "</td>\n            <td><a href=\"").concat(book.purchaseLink, "\" target=\"_blank\">Purchase</a></td>\n            <td>\n                <div class=\"button-container\">\n                    <button class=\"edit-btn\" onclick=\"bookManager.editBook(").concat(index, ")\">Edit</button>\n                    <button class=\"delete-btn\" onclick=\"bookManager.deleteBook(").concat(index, ")\">Delete</button>\n                    <button class=\"details-btn\" onclick=\"bookManager.showBookDetails(").concat(index, ")\">Details</button>\n                </div>\n            </td>\n        ");
-                (_b = this.bookList) === null || _b === void 0 ? void 0 : _b.appendChild(row);
-            };
-            BookManager.prototype.editBook = function (index) {
-                var books = JSON.parse(localStorage.getItem("books") || "[]");
-                var book = books[index];
-                localStorage.setItem("editBook", JSON.stringify({ book: book, index: index }));
-                window.location.href = "add-book.html";
-            };
-            BookManager.prefillForm = function () {
-                var editData = JSON.parse(localStorage.getItem("editBook") || "{}");
-                if (editData) {
-                    var book = editData.book, index = editData.index;
-                    document.getElementById("title").value = book.title;
-                    document.getElementById("author").value = book.author;
-                    document.getElementById("isbn").value = book.isbn;
-                    document.getElementById("pub-date").value = book.pubDate;
-                    document.getElementById("genre").value = book.genre;
-                    document.getElementById("price").value = book.price || "";
-                    document.getElementById("edit-index").value = index;
-                    localStorage.removeItem("editBook");
+    // Book validation methods
+    BookManager.prototype.validateBook = function (book) {
+        var errors = [];
+        if (!book.title)
+            errors.push("Title is required");
+        if (!book.author)
+            errors.push("Author is required");
+        if (!book.isbn)
+            errors.push("ISBN is required");
+        if (!this.validateISBN(book.isbn || ""))
+            errors.push("ISBN must contain only numeric characters");
+        return errors;
+    };
+    BookManager.prototype.validateISBN = function (isbn) {
+        return /^\d+$/.test(isbn);
+    };
+    BookManager.prototype.getLocalBooks = function () {
+        var books = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "[]");
+        return books.map(function (book) { return (__assign(__assign({}, book), { isLocal: true })); });
+    };
+    BookManager.prototype.saveBooks = function (books) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(books));
+    };
+    BookManager.prototype.addBook = function (book) {
+        var books = this.getLocalBooks();
+        books.push(book);
+        this.saveBooks(books);
+        this.allBooks = __spreadArray(__spreadArray([], books, true), this.allBooks.filter(function (b) { return !b.isLocal; }), true);
+    };
+    BookManager.prototype.updateBook = function (index, book) {
+        var books = this.getLocalBooks();
+        books[index] = __assign(__assign({}, book), { isLocal: true }); // Ensure isLocal is set
+        this.saveBooks(books);
+        this.allBooks = __spreadArray(__spreadArray([], books, true), this.allBooks.filter(function (b) { return !b.isLocal; }), true);
+    };
+    BookManager.prototype.deleteBook = function (index) {
+        var books = this.getLocalBooks();
+        books.splice(index, 1);
+        this.saveBooks(books);
+        this.allBooks = __spreadArray(__spreadArray([], books, true), this.allBooks.filter(function (b) { return !b.isLocal; }), true);
+    };
+    // API methods
+    BookManager.prototype.fetchApiBooks = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, apiBooks, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch(this.API_URL)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.ok)
+                            throw new Error("Failed to fetch data from the server.");
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        apiBooks = _a.sent();
+                        return [2 /*return*/, apiBooks.map(function (item) { return ({
+                                title: String(item.title || "Untitled"),
+                                author: "Author",
+                                isbn: "12",
+                                pubDate: "2025-01-01",
+                                genre: "API Genre",
+                                price: 20.0,
+                                purchaseLink: "https://www.amazon.in/s?k=books",
+                                bookType: "EBook",
+                                isLocal: false
+                            }); })];
+                    case 3:
+                        error_2 = _a.sent();
+                        console.error("Error fetching books from server:", error_2);
+                        return [2 /*return*/, []];
+                    case 4: return [2 /*return*/];
                 }
-            };
-            BookManager.prototype.deleteBook = function (index) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var books;
-                    return __generator(this, function (_b) {
-                        books = JSON.parse(localStorage.getItem("books") || "[]");
-                        books.splice(index, 1);
-                        localStorage.setItem("books", JSON.stringify(books));
-                        this.loadBooks();
+            });
+        });
+    };
+    // Book age calculation
+    BookManager.prototype.calculateBookAge = function (pubDate) {
+        var publicationDate = new Date(pubDate);
+        var currentDate = new Date();
+        var age = currentDate.getFullYear() - publicationDate.getFullYear();
+        return age > 0 ? "".concat(age, " year(s)") : "Less than a year";
+    };
+    // Filter and sort methods
+    BookManager.prototype.setSearchTerm = function (term) {
+        this.currentSearchTerm = term;
+    };
+    BookManager.prototype.setGenreFilter = function (filter) {
+        this.currentGenreFilter = filter;
+    };
+    BookManager.prototype.setSortOption = function (option) {
+        this.currentSortOption = option;
+    };
+    BookManager.prototype.resetFilters = function () {
+        this.currentSearchTerm = "";
+        this.currentGenreFilter = "";
+        this.currentSortOption = "";
+    };
+    BookManager.prototype.filterAndSortBooks = function () {
+        var filtered = this.filterBooks();
+        return this.sortBooks(filtered);
+    };
+    BookManager.prototype.filterBooks = function () {
+        var _this = this;
+        return this.allBooks.filter(function (book) {
+            var searchMatch = _this.matchesSearchTerm(book);
+            var genreMatch = _this.matchesGenre(book);
+            return searchMatch && genreMatch;
+        });
+    };
+    BookManager.prototype.matchesSearchTerm = function (book) {
+        if (!this.currentSearchTerm)
+            return true;
+        var searchLower = this.currentSearchTerm.toLowerCase();
+        return (String(book.title || "").toLowerCase().includes(searchLower) ||
+            String(book.author || "").toLowerCase().includes(searchLower) ||
+            String(book.genre || "").toLowerCase().includes(searchLower));
+    };
+    BookManager.prototype.matchesGenre = function (book) {
+        if (!this.currentGenreFilter)
+            return true;
+        var bookGenre = String(book.genre || "").toLowerCase();
+        var filter = this.currentGenreFilter.toLowerCase();
+        switch (filter) {
+            case "fiction":
+                return bookGenre === "fiction" ||
+                    bookGenre.includes("novel") ||
+                    bookGenre.includes("fiction");
+            case "non-fiction":
+                return bookGenre === "non-fiction" ||
+                    bookGenre.includes("non-fiction") ||
+                    bookGenre.includes("nonfiction") ||
+                    bookGenre.includes("biography") ||
+                    bookGenre.includes("history") ||
+                    bookGenre.includes("science");
+            default:
+                return true;
+        }
+    };
+    BookManager.prototype.sortBooks = function (books) {
+        var _this = this;
+        if (!this.currentSortOption)
+            return books;
+        return __spreadArray([], books, true).sort(function (a, b) {
+            var titleA = String(a.title || "").toLowerCase();
+            var titleB = String(b.title || "").toLowerCase();
+            return _this.currentSortOption === "asc"
+                ? titleA.localeCompare(titleB)
+                : titleB.localeCompare(titleA);
+        });
+    };
+    return BookManager;
+}());
+// Book Renderer Class
+var BookRenderer = /** @class */ (function () {
+    function BookRenderer(bookListElement) {
+        this.bookManager = new BookManager();
+        this.bookList = bookListElement;
+        this.initializeEventListeners();
+        this.initializeBooks();
+    }
+    BookRenderer.prototype.initializeBooks = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var books;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.bookManager.initializeBooks()];
+                    case 1:
+                        books = _a.sent();
+                        this.renderBooks(books);
                         return [2 /*return*/];
-                    });
-                });
-            };
-            BookManager.prototype.showBookDetails = function (index) {
-                var books = JSON.parse(localStorage.getItem("books") || "[]");
-                var book = books[index];
-                var bookAge = this.calculateBookAge(book.pubDate);
-                if (book) {
-                    alert("Title: ".concat(book.title, "\n                Author: ").concat(book.author, "\n                ISBN: ").concat(book.isbn || "N/A", "\n                Publication Date: ").concat(book.pubDate || "N/A", "\n                Age: ").concat(bookAge, "\n                Genre: ").concat(book.genre || "N/A", "\n                Book Type: ").concat(book.bookType || "N/A", "\n                Price: ").concat(book.price ? "$".concat(book.price) : "N/A", "\n                Purchase Link: ").concat(book.purchaseLink));
                 }
-                else {
-                    alert("Book details not found.");
+            });
+        });
+    };
+    BookRenderer.prototype.renderBooks = function (books) {
+        var _this = this;
+        this.bookList.innerHTML = "";
+        if (books.length === 0) {
+            this.bookList.innerHTML = "<tr><td colspan='8'>No books found.</td></tr>";
+            return;
+        }
+        books.forEach(function (book, index) { return _this.renderBookRow(book, index); });
+    };
+    BookRenderer.prototype.renderBookRow = function (book, index) {
+        var bookAge = this.bookManager.calculateBookAge(book.pubDate);
+        var row = document.createElement("tr");
+        row.innerHTML = "\n            <td>".concat(book.title, "</td>\n            <td>").concat(book.author, "</td>\n            <td>").concat(book.isbn || "N/A", "</td>\n            <td>").concat(book.pubDate || "N/A", "</td>\n            <td>").concat(book.genre || "N/A", "</td>\n            <td>").concat(book.bookType || "N/A", "</td>\n            <td>").concat(book.price ? "$".concat(book.price) : "N/A", "</td>\n            <td>").concat(bookAge, "</td>\n            <td><a href=\"").concat(book.purchaseLink, "\" target=\"_blank\">Purchase</a></td>\n            <td>\n                <div class=\"button-container\">\n                    <button class=\"edit-btn\" data-index=\"").concat(index, "\">Edit</button>\n                    <button class=\"delete-btn\" data-index=\"").concat(index, "\">Delete</button>\n                    <button class=\"details-btn\" data-index=\"").concat(index, "\">Details</button>\n                </div>\n            </td>\n        ");
+        this.bookList.appendChild(row);
+    };
+    // Form handling methods
+    BookRenderer.prototype.handleFormSubmit = function (e) {
+        e.preventDefault();
+        var formData = this.getFormData();
+        var errors = this.bookManager.validateBook(formData);
+        if (errors.length > 0) {
+            alert(errors.join("\n"));
+            return;
+        }
+        var editIndex = document.getElementById("edit-index").value;
+        if (editIndex !== "") {
+            this.bookManager.updateBook(parseInt(editIndex), formData);
+        }
+        else {
+            this.bookManager.addBook(formData);
+        }
+        alert("Book saved successfully!");
+        window.location.href = "index.html";
+    };
+    BookRenderer.prototype.prefillForm = function () {
+        var editData = JSON.parse(localStorage.getItem("editBook") || "{}");
+        if (!editData.book)
+            return;
+        var book = editData.book, index = editData.index;
+        Object.entries(book).forEach(function (_a) {
+            var key = _a[0], value = _a[1];
+            var element = document.getElementById(key);
+            if (element)
+                element.value = value;
+        });
+        document.getElementById("edit-index").value = index;
+        localStorage.removeItem("editBook");
+    };
+    BookRenderer.prototype.getFormData = function () {
+        return {
+            title: document.getElementById("title").value,
+            author: document.getElementById("author").value,
+            isbn: document.getElementById("isbn").value,
+            pubDate: document.getElementById("pub-date").value,
+            genre: document.getElementById("genre").value,
+            price: parseFloat(document.getElementById("price").value),
+            purchaseLink: document.getElementById("purchase-link").value,
+            bookType: document.getElementById("book-type").value
+        };
+    };
+    BookRenderer.prototype.initializeEventListeners = function () {
+        var _this = this;
+        var _a, _b, _c, _d, _e, _f;
+        // Search
+        var searchBar = document.getElementById("search-bar");
+        searchBar === null || searchBar === void 0 ? void 0 : searchBar.addEventListener("input", function (e) {
+            _this.bookManager.setSearchTerm(e.target.value);
+            _this.initializeBooks();
+        });
+        (_a = document.getElementById("book-form")) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", function (e) { return _this.handleFormSubmit(e); });
+        // Filters
+        (_b = document.getElementById("filter-fiction")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", function () {
+            _this.bookManager.setGenreFilter("fiction");
+            _this.initializeBooks();
+        });
+        (_c = document.getElementById("filter-non-fiction")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", function () {
+            _this.bookManager.setGenreFilter("non-fiction");
+            _this.initializeBooks();
+        });
+        (_d = document.getElementById("clear-filters")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", function () {
+            _this.bookManager.resetFilters();
+            if (searchBar)
+                searchBar.value = "";
+            _this.initializeBooks();
+        });
+        // Sorting
+        (_e = document.getElementById("sort-asc")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", function () {
+            _this.bookManager.setSortOption("asc");
+            _this.initializeBooks();
+        });
+        (_f = document.getElementById("sort-desc")) === null || _f === void 0 ? void 0 : _f.addEventListener("click", function () {
+            _this.bookManager.setSortOption("desc");
+            _this.initializeBooks();
+        });
+        // Book actions
+        document.addEventListener("click", function (e) { return __awaiter(_this, void 0, void 0, function () {
+            var target, index;
+            return __generator(this, function (_a) {
+                target = e.target;
+                if (!target.dataset.index)
+                    return [2 /*return*/];
+                index = parseInt(target.dataset.index);
+                if (target.classList.contains("edit-btn"))
+                    this.handleEdit(index);
+                if (target.classList.contains("delete-btn"))
+                    this.handleDelete(index);
+                if (target.classList.contains("details-btn"))
+                    this.handleDetails(index);
+                return [2 /*return*/];
+            });
+        }); });
+    };
+    BookRenderer.prototype.saveBooks = function () {
+        throw new Error("Method not implemented.");
+    };
+    BookRenderer.prototype.handleEdit = function (index) {
+        var books = this.bookManager.getLocalBooks();
+        localStorage.setItem("editBook", JSON.stringify({ book: books[index], index: index }));
+        window.location.href = "add-book.html";
+    };
+    BookRenderer.prototype.handleDelete = function (index) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.bookManager.deleteBook(index);
+                        return [4 /*yield*/, this.initializeBooks()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
-            };
-            BookManager.prototype.saveBook = function (e) {
-                e.preventDefault();
-                var title = document.getElementById("title").value;
-                var author = document.getElementById("author").value;
-                var isbn = document.getElementById("isbn").value;
-                var pubDate = document.getElementById("pub-date").value;
-                var genre = document.getElementById("genre").value;
-                var price = document.getElementById("price").value;
-                var purchaseLink = document.getElementById("purchase-link").value;
-                var bookType = document.getElementById("book-type").value;
-                if (!validateISBN(isbn)) {
-                    alert("ISBN must contain only numeric characters.");
-                    return;
+            });
+        });
+    };
+    BookRenderer.prototype.handleDetails = function (index) {
+        return __awaiter(this, void 0, void 0, function () {
+            var books, book, bookAge;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.bookManager.initializeBooks()];
+                    case 1:
+                        books = _a.sent();
+                        book = books[index];
+                        bookAge = this.bookManager.calculateBookAge(book.pubDate);
+                        alert("\n            Title: ".concat(book.title, "\n            Author: ").concat(book.author, "\n            ISBN: ").concat(book.isbn || "N/A", "\n            Publication Date: ").concat(book.pubDate || "N/A", "\n            Age: ").concat(bookAge, "\n            Genre: ").concat(book.genre || "N/A", "\n            Book Type: ").concat(book.bookType || "N/A", "\n            Price: ").concat(book.price ? "$".concat(book.price) : "N/A", "\n            Purchase Link: ").concat(book.purchaseLink, "\n        "));
+                        return [2 /*return*/];
                 }
-                var books = JSON.parse(localStorage.getItem("books") || "[]");
-                var editIndex = document.getElementById("edit-index").value;
-                if (editIndex !== "") {
-                    books[editIndex] = { title: title, author: author, isbn: isbn, pubDate: pubDate, genre: genre, price: price, purchaseLink: purchaseLink, bookType: bookType };
-                }
-                else {
-                    books.push({ title: title, author: author, isbn: isbn, pubDate: pubDate, genre: genre, price: price, purchaseLink: purchaseLink, bookType: bookType });
-                }
-                localStorage.setItem("books", JSON.stringify(books));
-                alert("Book saved successfully!");
-                window.location.href = "index.html";
-            };
-            BookManager.prototype.init = function () {
-                var _this = this;
-                var _b, _c, _d, _e, _f, _g, _h;
-                (_b = document.getElementById("book-form")) === null || _b === void 0 ? void 0 : _b.addEventListener("submit", function (e) { return _this.saveBook(e); });
-                (_c = this.searchBar) === null || _c === void 0 ? void 0 : _c.addEventListener("input", function (e) {
-                    _this.loadBooks(e.target.value);
-                });
-                (_d = this.filterFiction) === null || _d === void 0 ? void 0 : _d.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "", "fiction"); });
-                (_e = this.filterNonFiction) === null || _e === void 0 ? void 0 : _e.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "", "non-fiction"); });
-                (_f = this.clearFiltersBtn) === null || _f === void 0 ? void 0 : _f.addEventListener("click", function () {
-                    _this.searchBar.value = "";
-                    _this.loadBooks();
-                });
-                (_g = this.sortAscBtn) === null || _g === void 0 ? void 0 : _g.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "asc"); });
-                (_h = this.sortDescBtn) === null || _h === void 0 ? void 0 : _h.addEventListener("click", function () { return _this.loadBooks(_this.searchBar.value, "desc"); });
-                this.loadBooks();
-            };
-            return BookManager;
-        }(_classSuper)),
-        (function () {
-            var _b;
-            var _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create((_b = _classSuper[Symbol.metadata]) !== null && _b !== void 0 ? _b : null) : void 0;
-            _createBookRow_decorators = [logMethodParams];
-            _editBook_decorators = [logMethodParams];
-            _deleteBook_decorators = [logMethodParams];
-            _showBookDetails_decorators = [logMethodParams];
-            __esDecorate(_a, null, _createBookRow_decorators, { kind: "method", name: "createBookRow", static: false, private: false, access: { has: function (obj) { return "createBookRow" in obj; }, get: function (obj) { return obj.createBookRow; } }, metadata: _metadata }, null, _instanceExtraInitializers);
-            __esDecorate(_a, null, _editBook_decorators, { kind: "method", name: "editBook", static: false, private: false, access: { has: function (obj) { return "editBook" in obj; }, get: function (obj) { return obj.editBook; } }, metadata: _metadata }, null, _instanceExtraInitializers);
-            __esDecorate(_a, null, _deleteBook_decorators, { kind: "method", name: "deleteBook", static: false, private: false, access: { has: function (obj) { return "deleteBook" in obj; }, get: function (obj) { return obj.deleteBook; } }, metadata: _metadata }, null, _instanceExtraInitializers);
-            __esDecorate(_a, null, _showBookDetails_decorators, { kind: "method", name: "showBookDetails", static: false, private: false, access: { has: function (obj) { return "showBookDetails" in obj; }, get: function (obj) { return obj.showBookDetails; } }, metadata: _metadata }, null, _instanceExtraInitializers);
-            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        })(),
-        _a;
-}();
-var bookManager = new BookManager();
+            });
+        });
+    };
+    return BookRenderer;
+}());
 document.addEventListener("DOMContentLoaded", function () {
-    BookManager.prefillForm();
+    var bookList = document.getElementById("book-list");
+    var bookForm = document.getElementById("book-form");
+    if (bookList) {
+        var bookRenderer = new BookRenderer(bookList);
+    }
+    if (bookForm) {
+        var bookRenderer_1 = new BookRenderer(document.createElement('tbody'));
+        bookRenderer_1.prefillForm();
+        bookForm.addEventListener("submit", function (e) { return bookRenderer_1.handleFormSubmit(e); });
+    }
 });
