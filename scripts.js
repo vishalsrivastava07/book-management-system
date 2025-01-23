@@ -1,3 +1,4 @@
+// // Types
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -57,7 +58,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 // Main Book Manager Class
 var BookManager = /** @class */ (function () {
     function BookManager() {
-        this.STORAGE_KEY = "books";
+        this.STORAGE_KEY = "books"; // It tells where all the books stored in localStorage
         this.API_URL = "https://jsonplaceholder.typicode.com/posts";
         this.allBooks = [];
         this.currentSearchTerm = "";
@@ -104,6 +105,7 @@ var BookManager = /** @class */ (function () {
     BookManager.prototype.validateISBN = function (isbn) {
         return /^\d+$/.test(isbn);
     };
+    //It handles books stored locally in localStorage
     BookManager.prototype.getLocalBooks = function () {
         var books = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "[]");
         return books.map(function (book) { return (__assign(__assign({}, book), { isLocal: true })); });
@@ -245,10 +247,10 @@ var BookManager = /** @class */ (function () {
 // Book Renderer Class
 var BookRenderer = /** @class */ (function () {
     function BookRenderer(bookListElement) {
-        this.bookManager = new BookManager();
-        this.bookList = bookListElement;
-        this.initializeEventListeners();
-        this.initializeBooks();
+        this.bookManager = new BookManager(); // Create an instance of the bookmanager class to handle data-related operations
+        this.bookList = bookListElement; // it stores the html element where the book list will be rendered 
+        this.initializeEventListeners(); // sets up event handlers
+        this.initializeBooks(); // loads and render the initial list of books
     }
     BookRenderer.prototype.initializeBooks = function () {
         return __awaiter(this, void 0, void 0, function () {

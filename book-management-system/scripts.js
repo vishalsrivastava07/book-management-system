@@ -1,4 +1,5 @@
 "use strict";
+// // Types
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,7 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 // Main Book Manager Class
 class BookManager {
     constructor() {
-        this.STORAGE_KEY = "books";
+        this.STORAGE_KEY = "books"; // It tells where all the books stored in localStorage
         this.API_URL = "https://jsonplaceholder.typicode.com/posts";
         this.allBooks = [];
         this.currentSearchTerm = "";
@@ -50,6 +51,7 @@ class BookManager {
     validateISBN(isbn) {
         return /^\d+$/.test(isbn);
     }
+    //It handles books stored locally in localStorage
     getLocalBooks() {
         const books = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "[]");
         return books.map((book) => (Object.assign(Object.assign({}, book), { isLocal: true })));
@@ -178,10 +180,10 @@ class BookManager {
 // Book Renderer Class
 class BookRenderer {
     constructor(bookListElement) {
-        this.bookManager = new BookManager();
-        this.bookList = bookListElement;
-        this.initializeEventListeners();
-        this.initializeBooks();
+        this.bookManager = new BookManager(); // Create an instance of the bookmanager class to handle data-related operations
+        this.bookList = bookListElement; // it stores the html element where the book list will be rendered 
+        this.initializeEventListeners(); // sets up event handlers
+        this.initializeBooks(); // loads and render the initial list of books
     }
     initializeBooks() {
         return __awaiter(this, void 0, void 0, function* () {

@@ -1,20 +1,56 @@
-// Types
-interface Book {
-    title?: string | null;
-    author?: string | null;
-    isbn?: string | null;
-    pubDate: string;
-    genre?: string | null;
-    price?: number | null;
-    purchaseLink?: string | null;
-    bookType?: string | null;
-    isLocal?: boolean;
+// // Types
+
+// interface Book {
+//     title: string;
+//     author: string;
+//     isbn: string;
+//     pubDate: string;
+//     genre: string;
+//     price: number;
+//     purchaseLink: string;
+//     bookType: string;
+//     isLocal: boolean;
+// }
+
+interface BookCore {
+    title: string;
+    author: string;
 }
+
+interface BookIdentification {
+    isbn: string;
+    genre: string;
+}
+
+interface PublicationDetails {
+    pubDate: string;
+    bookType: string;
+}
+
+interface BookCommerce {
+    price: number;
+    purchaseLink: string;
+}
+
+interface BookMetadata {
+    isLocal: boolean;
+}
+
+interface Book extends 
+    BookCore, 
+    BookIdentification, 
+    PublicationDetails, 
+    BookCommerce, 
+    BookMetadata {}
+
+
+
+
 
 // Main Book Manager Class
 class BookManager {
 
-    private readonly STORAGE_KEY = "books";
+    private readonly STORAGE_KEY = "books"; // It tells where all the books stored in localStorage
     private readonly API_URL = "https://jsonplaceholder.typicode.com/posts";
     private allBooks: Book[] = [];
     private currentSearchTerm: string = "";
@@ -50,6 +86,8 @@ class BookManager {
         return /^\d+$/.test(isbn);
     }
 
+
+    //It handles books stored locally in localStorage
     getLocalBooks(): Book[] {  // Changed to public
         const books = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "[]");
         return books.map((book: Book) => ({ ...book, isLocal: true }));
@@ -195,10 +233,10 @@ class BookRenderer {
     private bookList: HTMLElement;
 
     constructor(bookListElement: HTMLElement) {
-        this.bookManager = new BookManager();
-        this.bookList = bookListElement;
-        this.initializeEventListeners();
-        this.initializeBooks();
+        this.bookManager = new BookManager(); // Create an instance of the bookmanager class to handle data-related operations
+        this.bookList = bookListElement; // it stores the html element where the book list will be rendered 
+        this.initializeEventListeners(); // sets up event handlers
+        this.initializeBooks(); // loads and render the initial list of books
     }
 
     private async initializeBooks(): Promise<void> {
